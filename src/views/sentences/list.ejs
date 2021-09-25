@@ -1,0 +1,161 @@
+<%- include('partials/header') %>
+
+<h1>List Job Sentences</h1>
+
+<div class="container">
+	<div class="container">
+		Category Sorting Direction
+		<select
+			name="sortDirection"
+			id="sortDirection"
+			onchange="changeOnSortingDirection()"
+		>
+			<option value="asc" selected>asc</option>
+			<option value="desc">desc</option>
+		</select>
+	</div>
+
+	<div class="container">
+		Filter By Category
+		<select
+			name="filterByCategory"
+			id="filterByCategory"
+			onchange="changeOnFilterByCategory()"
+		>
+			<option selected></option>
+			<% categories.forEach(function(category) { %>
+			<option><%= category %></option>
+			<% }); %>
+		</select>
+	</div>
+
+	<div class="container">
+		<div class="container">
+			<table id="sentencesTable">
+				<tr>
+					<th>Id</th>
+					<th>Text</th>
+					<th>Category</th>
+				</tr>
+				<tr>
+					<td>Loading...</td>
+					<td>Loading...</td>
+					<td>Loading...</td>
+				</tr>
+			</table>
+		</div>
+		<div class="container">
+			<button onclick="previousPage()">Previous Page</button>
+			<button onclick="nextPage()">Next Page</button>
+		</div>
+	</div>
+</div>
+
+<script>
+	const tableHeadersRow = `<tr>
+			<th>Id</th>
+			<th>Text</th>
+			<th>Category</th>
+		</tr>`;
+
+	let sentences;
+	let startAfter, endBefore;
+	const pageSize = 10;
+	let sortDirection = document.getElementById("sortDirection").value;
+	let categoryFilter = document.getElementById("filterByCategory").value;
+
+	loadDataToTable();
+
+	async function changeOnSortingDirection() {
+		sortDirection = document.getElementById("sortDirection").value;
+		startAfter = undefined;
+		endBefore = undefined;
+
+		await loadDataToTable();
+	}
+
+	async function changeOnFilterByCategory() {
+		categoryFilter = document.getElementById("filterByCategory").value;
+		startAfter = undefined;
+		endBefore = undefined;
+
+		if (categoryFilter) {
+			document.getElementById("sortDirection").disabled = true;
+		} else {
+			document.getElementById("sortDirection").disabled = false;
+		}
+
+		await loadDataToTable({});
+	}
+
+	async function loadDataToTable() {
+		sentences = await getSentences();
+
+		const sentencesTable = document.getElementById("sentencesTable");
+		let html = tableHeadersRow;
+
+		for (const sentence of sentences) {
+			html += `<tr>
+                    <td><a href="/sentences/${sentence.id}">${sentence.id}</a></td>
+                    <td>${sentence.text}</td>
+                    <td>${sentence.category}</td>
+                </tr>`;
+		}
+
+		sentencesTable.innerHTML = html;
+	}
+
+	async function getSentences() {
+		let URI = "/api/sentences";
+
+		const params = [];
+		params.push(`limit=${pageSize}`);
+
+		if (startAfter) {
+			params.push(`startAfter=${startAfter}`);
+		} else if (endBefore) {
+			params.push(`endBefore=${endBefore}`);
+		}
+
+		if (categoryFilter) {
+			params.push(`category=${categoryFilter}`);
+		} else if (sortDirection) {
+			params.push(`sort=${sortDirection}`);
+		}
+
+		if (params.length > 0) {
+			URI += "?" + params.join("&");
+		}
+		console.log(URI);
+
+		const response = await fetch(URI);
+		const { sentences } = await response.json();
+		console.log(sentences);
+
+		return sentences;
+	}
+
+	async function previousPage() {
+		startAfter = undefined;
+		endBefore = undefined;
+
+		if (sentences.length) {
+			endBefore = sentences[0].id;
+		}
+
+		await loadDataToTable();
+	}
+
+	async function nextPage() {
+		startAfter = undefined;
+		endBefore = undefined;
+
+		if (sentences.length) {
+			startAfter = sentences[sentences.length - 1].id;
+		}
+
+		await loadDataToTable();
+	}
+</script>
+
+<%- include('partials/footer') %>

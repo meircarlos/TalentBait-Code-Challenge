@@ -1,0 +1,34 @@
+<%- include('partials/header') %>
+
+<h1>Job Sentence Details</h1>
+
+<div class="container">
+	<div class="container">
+		<p for="text"><strong>Text</strong></p>
+		<p for="text"><%= sentence.text %></p>
+	</div>
+
+	<div class="container">
+		<p for="category"><strong>Category</strong></p>
+		<p for="category"><%= sentence.category %></p>
+	</div>
+
+	<div class="container">
+		<a href="/sentences/<%= sentence.id %>/update">
+			<button>Update</button></a
+		>
+		<button onclick="deleteSentence('<%= sentence.id %>')">Delete</button>
+	</div>
+</div>
+
+<script>
+	async function deleteSentence(sentenceId) {
+		await fetch(`/api/sentences/${sentenceId}`, {
+			method: "DELETE",
+		});
+
+		window.location.replace("/sentences");
+	}
+</script>
+
+<%- include('partials/footer') %>

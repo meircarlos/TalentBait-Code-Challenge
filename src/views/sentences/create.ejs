@@ -1,0 +1,25 @@
+<%- include('partials/header') %>
+
+<h1>Create a Job Sentence</h1>
+
+<div class="container">
+	<form action="/api/sentences" method="POST">
+		<div class="container">
+			<label for="text">Text</label>
+			<input type="text" name="text" id="text" />
+		</div>
+
+		<div class="container">
+			<label for="category">Category</label>
+			<select name="category" id="categories">
+				<% categories.forEach(function(category) { %>
+				<option><%= category %></option>
+				<% }); %>
+			</select>
+		</div>
+
+		<button type="submit" class="container">Create</button>
+	</form>
+</div>
+
+<%- include('partials/footer') %>
