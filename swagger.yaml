@@ -1,0 +1,169 @@
+swagger: "2.0"
+info:
+    title: TalentBait Code Challenge
+    version: 1.0.0
+    description: <p>NodeJS CRUD API that handles data for job posting sentences</p>
+
+host: secret-shelf-53244.herokuapp.com
+basePath: /api
+schemes:
+    - https
+
+tags:
+    - name: Sentences
+      description: Endpoints related to job posting sentences
+
+paths:
+    /sentences:
+        get:
+            tags:
+                - Sentences
+            summary: Get job posting sentences
+            description: Returns the paginated sentences from the database according to the provided parameters
+            produces:
+                - application/json
+            parameters:
+                - in: "query"
+                  name: "startAfter"
+                  description: "Specifies the Id of the document from which the sentences will start to be retrieved"
+                  required: false
+                  type: "string"
+                - in: "query"
+                  name: "endBefore"
+                  description: "Specifies the Id of the document from which the sentences will start to be retrieved in reverse order"
+                  required: false
+                  type: "string"
+                - in: "query"
+                  name: "limit"
+                  description: "Sets the amount of records there are in a page"
+                  required: false
+                  type: "number"
+                - in: "query"
+                  name: "category"
+                  description: "Filters by the provided category"
+                  required: false
+                  type: "string"
+                  enum:
+                      - "responsibility"
+                      - "benefit"
+                      - "none"
+                      - "education"
+                      - "experience"
+                      - "soft"
+                      - "tech"
+                  #collectionFormat: multi
+                - in: "query"
+                  name: "sort"
+                  description: "Sorts by category with the direction of the sorting (asc or desc) specified.\nIt only works if a category is not set."
+                  required: false
+                  type: "string"
+                  enum:
+                      - "asc"
+                      - "desc"
+            responses:
+                200:
+                    description: Ok
+        post:
+            tags:
+                - Sentences
+            summary: Create a sentence
+            description: Creates a sentence with the provided parameters and returns the created sentence details
+            produces:
+                - application/json
+            parameters:
+                - name: body
+                  in: body
+                  description: Sentence object to be created
+                  required: true
+                  schema:
+                      $ref: "#/definitions/JobSentenceCreate"
+            responses:
+                201:
+                    description: Created
+    /sentences/translate:
+        get:
+            tags:
+                - Sentences
+            summary: Translates some text to English
+            description: Translates some text to English
+            produces:
+                - application/json
+            parameters:
+                - in: "query"
+                  name: "text"
+                  description: "Specifies the text to translate to English"
+                  required: true
+                  type: "string"
+            responses:
+                200:
+                    description: Ok
+    /sentences/{id}:
+        get:
+            tags:
+                - Sentences
+            summary: Get a sentence by Id
+            description: Returns the details of a specific sentence
+            produces:
+                - application/json
+            parameters:
+                - name: id
+                  in: path
+                  description: Id of the sentence to retrieve
+                  required: true
+                  type: string
+            responses:
+                200:
+                    description: Ok
+                401:
+                    description: Not Found
+        post:
+            tags:
+                - Sentences
+            summary: Update a sentence by Id
+            description: Updates the sentence details and returns the new sentence details
+            produces:
+                - application/json
+            parameters:
+                - name: id
+                  in: path
+                  description: Id of the sentence to retrieve
+                  required: true
+                  type: string
+                - name: body
+                  in: body
+                  description: Sentence details to update
+                  required: true
+                  schema:
+                      $ref: "#/definitions/JobSentenceCreate"
+            responses:
+                200:
+                    description: Query successful
+                401:
+                    description: Not Found
+        delete:
+            tags:
+                - Sentences
+            summary: Delete a sentence by Id
+            description: Deletes the sentence
+            produces:
+                - application/json
+            parameters:
+                - name: id
+                  in: path
+                  description: Id of the sentence to delete
+                  required: true
+                  type: string
+            responses:
+                200:
+                    description: Ok
+
+definitions:
+    JobSentenceCreate:
+        type: object
+        properties:
+            text:
+                type: string
+                example: "some sentence"
+            category:
+                type: string
+                example: "benefit"
