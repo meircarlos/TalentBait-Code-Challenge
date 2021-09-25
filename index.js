@@ -16,7 +16,11 @@ async function startServer() {
 
 	const server = await app.listen(config.port);
 
-	console.log(`The server is running on http://localhost:${config.port}.`);
+	if (process.env.NODE_ENV === "development") {
+		console.log(
+			`The server is running on http://localhost:${config.port}.`
+		);
+	}
 
 	return {
 		server,
