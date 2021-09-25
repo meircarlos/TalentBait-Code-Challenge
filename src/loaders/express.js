@@ -1,11 +1,14 @@
 const path = require("path");
 const express = require("express");
+const cors = require("cors");
 const config = require("../config");
 const views = require("../views");
 const routes = require("../api");
 const errorMiddleware = require("../api/middlewares/error-handler");
 
 module.exports = ({ app }) => {
+	app.use(cors());
+
 	app.use(express.static(__dirname + "/../../public"));
 	app.set("view engine", "ejs");
 	app.set("views", [
